@@ -1,0 +1,33 @@
+$ErrorActionPreference= 'silentlycontinue': This sets the error action preference to silently continue, which means that any errors encountered during script execution will not be displayed.
+
+Test-ListenerStatus: This is a function that takes a listener name as a parameter and uses the Test-NetConnection cmdlet to check if the listener is online and accessible. The function returns a boolean value indicating whether the test succeeded or failed.
+
+$listenerName = "opavglweb01-d": This sets the listener name to be checked by the Test-ListenerStatus function.
+
+Get-PrimaryNode: This is a function that identifies the primary node of an availability group. It does this by getting the cluster group associated with the availability group and returning the owner node of that group.
+
+Get-PassiveNodes: This is a function that identifies the passive nodes of an availability group. It does this by getting all nodes in the cluster that are not the owner node of the cluster group associated with the availability group.
+
+Test-SQLServerVersion: This is a function that takes a computer name as a parameter and uses the Invoke-Sqlcmd cmdlet to check the version of SQL Server installed on that computer. The function returns a boolean value indicating whether the version is SQL Server 2022 or not.
+
+$status = Test-ListenerStatus -ListenerName $listenerName: This calls the Test-ListenerStatus function and passes in the listener name set earlier. The result is stored in the $status variable.
+
+if ($status): This checks if the $status variable is true, meaning that the listener is online and accessible.
+
+Identify Primary Node: This calls the Get-PrimaryNode function to identify the primary node of the availability group.
+
+Identify Passive Nodes: This calls the Get-PassiveNodes function to identify the passive nodes of the availability group.
+
+Check if current node is primary replica: This checks if the current node is the primary replica of the availability group. If it is, a message is displayed indicating this. If it is not, the passive nodes are checked to see if the current node is already included as a passive node. If it is not, a message is displayed indicating that the current node is not the primary replica and is not included as a passive node.
+
+Test-SQLServerVersion: This calls the Test-SQLServerVersion function to check the version of SQL Server installed on the current node.
+
+Check SQL Server version on passive nodes: This loops through the passive nodes identified earlier and calls the Test-SQLServerVersion function for each node to check the version of SQL Server installed on that node.
+
+if ($passiveNodes.Name -contains $currentNode): This checks if the current node is already included as a passive node. If it is, a message is displayed indicating this, and the script proceeds to change the configuration of the passive node.
+
+cd C:\Media: This changes the current directory to C:\Media.
+
+Start-Sleep -s 5: This pauses the script for 5 seconds.
+
+C:\Media\setup.exe /ConfigurationFile=C:\Automation\ConfigurationFile.ini /IAcceptSQLServerLicenseTerms /UpdateEnabled=True /UpdateSource="C:\Media\Temp": This runs the SQL Server setup executable with the specified parameters to change the configuration of the passive node.
